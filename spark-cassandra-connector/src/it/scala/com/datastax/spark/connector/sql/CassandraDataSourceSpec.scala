@@ -102,7 +102,8 @@ class CassandraDataSourceSpec extends SparkCassandraITFlatSpecBase with Logging 
         |OPTIONS (
         | table "$table",
         | keyspace "$keyspace",
-        | pushdown "$pushDown")
+        | pushdown "$pushDown",
+        | confirm.truncate "true")
       """.stripMargin.replaceAll("\n", " "))
   }
 
@@ -162,7 +163,7 @@ class CassandraDataSourceSpec extends SparkCassandraITFlatSpecBase with Logging 
       .write
       .format("org.apache.spark.sql.cassandra")
       .mode(Overwrite)
-      .options(Map("table" -> "test_insert2", "keyspace" -> ks))
+      .options(Map("table" -> "test_insert2", "keyspace" -> ks, "confirm.truncate" -> "true"))
       .save()
     createTempTable(ks, "test_insert2", "insertTable2")
     sqlContext.sql("SELECT * FROM insertTable2").collect() should have length 1
@@ -192,7 +193,7 @@ class CassandraDataSourceSpec extends SparkCassandraITFlatSpecBase with Logging 
     df.write
       .format("org.apache.spark.sql.cassandra")
       .mode(Overwrite)
-      .options(Map("table" -> "df_test", "keyspace" -> ks))
+      .options(Map("table" -> "df_test", "keyspace" -> ks, "confirm.truncate" -> "true"))
       .save()
     cassandraTable(TableRef("df_test", ks)).collect() should have length 1
   }
@@ -206,7 +207,7 @@ class CassandraDataSourceSpec extends SparkCassandraITFlatSpecBase with Logging 
     df.write
       .format("org.apache.spark.sql.cassandra")
       .mode(Overwrite)
-      .options(Map("table" -> "df_test2", "keyspace" -> ks))
+      .options(Map("table" -> "df_test2", "keyspace" -> ks, "confirm.truncate" -> "true"))
       .save()
     cassandraTable(TableRef("df_test2", ks)).collect() should have length 1
   }
