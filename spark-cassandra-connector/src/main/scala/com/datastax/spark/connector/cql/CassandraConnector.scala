@@ -48,7 +48,7 @@ import com.datastax.spark.connector.util.Logging
   *   - `spark.cassandra.connection.ssl.protocol`:              SSL protocol (default TLS)
   *   - `spark.cassandra.connection.ssl.enabledAlgorithms`:         SSL cipher suites (default TLS_RSA_WITH_AES_128_CBC_SHA, TLS_RSA_WITH_AES_256_CBC_SHA)
   */
-class CassandraConnector(conf: CassandraConnectorConf)
+class CassandraConnector(val conf: CassandraConnectorConf)
   extends Serializable with Logging {
 
   import com.datastax.spark.connector.cql.CassandraConnector._
@@ -201,7 +201,7 @@ object CassandraConnector extends Logging {
   def apply(sc: SparkContext): CassandraConnector = {
     val conf = CassandraConnectorConf(sc.getConf)
     val numExecutors: Int =
-      math.max(Option(sc.getExecutorStorageStatus).getOrElse(Array.empty).length, 1)
+      math.max(Option(sc.statusTracker.getExecutorInfos).getOrElse(Array.empty).length, 1)
     val numCores: Int = sc.defaultParallelism
     val coresPerExecutor: Int = math.max( numCores / numExecutors , 1)
     val runtimeConf = conf.copy( maxConnectionsPerExecutor = conf.maxConnectionsPerExecutor orElse (Some(coresPerExecutor)))
